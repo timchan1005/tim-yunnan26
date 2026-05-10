@@ -873,18 +873,17 @@ document.addEventListener('DOMContentLoaded', () => {
     target.value = desc || '找不到相關說明。可手動輸入。';
   });
 
-  // Service worker (PWA) — auto-reload when a new SW takes over so users
-  // always get fresh code (avoids the 'thin strip / broken modal' caching bug)
+  // Service-worker kill switch: if any old SW is still controlling this page,
+  // load the new self-destructing sw.js once so it cleans up.
+  // After that we never re-register — keeps things simple and bug-free.
   if ('serviceWorker' in navigator) {
-    let refreshed = false;
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.update().catch(() => {});
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      if (regs.length === 0) {
+        // Only register if there was a previous SW (otherwise users without SW history don't need it)
+        return;
+      }
+      navigator.serviceWorker.register('sw.js').catch(() => {});
     }).catch(() => {});
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshed) return;
-      refreshed = true;
-      window.location.reload();
-    });
   }
 });
 
