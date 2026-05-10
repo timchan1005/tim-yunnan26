@@ -645,13 +645,20 @@ let _geocoderService = null;
 async function _initGoogleServices() {
   if (_autocompleteService) return true;
   const ok = await (window._googleMapsReady || Promise.resolve(false));
-  if (!ok || !window.google || !window.google.maps || !window.google.maps.places) return false;
+  if (!ok) {
+    console.warn('[Google Places] SDK not ready (key missing or referrer blocked)');
+    return false;
+  }
+  if (!window.google || !window.google.maps || !window.google.maps.places) {
+    console.warn('[Google Places] google.maps.places unavailable');
+    return false;
+  }
   _autocompleteService = new google.maps.places.AutocompleteService();
   _geocoderService = new google.maps.Geocoder();
-  // PlacesService needs a DOM node; create a hidden one.
   const div = document.createElement('div');
   document.body.appendChild(div);
   _placesService = new google.maps.places.PlacesService(div);
+  console.log('[Google Places] services initialised');
   return true;
 }
 
@@ -724,8 +731,27 @@ async function searchPlaces(query) {
   if (!query || query.length < 2) return [];
   // Try Google first; if no results or Google not available, fall back to OSM.
   const g = await searchPlacesGoogle(query);
-  if (g && g.length > 0) return g;
+  if (g && g.length > 0) {
+    console.log(`[search] "${query}" → Google (${g.length} results)`);
+    updateSearchSourceBadge('google');
+    return g;
+  }
+  console.log(`[search] "${query}" → OSM fallback`);
+  updateSearchSourceBadge('osm');
   return await searchPlacesOSM(query);
+}
+
+function updateSearchSourceBadge(source) {
+  const el = document.getElementById('search-source-badge');
+  if (!el) return;
+  if (source === 'google') {
+    el.textContent = 'Google Places';
+    el.className = 'search-source-badge active-google';
+  } else {
+    el.textContent = 'OpenStreetMap';
+    el.className = 'search-source-badge active-osm';
+  }
+  el.hidden = false;
 }
 
 function renderSearchResults(items) {
