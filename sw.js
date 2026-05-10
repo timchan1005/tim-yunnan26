@@ -1,10 +1,11 @@
-// Minimal service worker — cache app shell for offline / Add to Home Screen
-const CACHE = 'yunnan-map-v1';
+// Service worker — network-first for app shell so updates always reach the user
+const VERSION = 'v4';
+const CACHE = `yunnan-map-${VERSION}`;
 const ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
+  './style.css?v=4',
+  './app.js?v=4',
   './data.js',
   './manifest.json',
   './icon.svg'
@@ -17,7 +18,7 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== CACHE + '-tiles').map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
@@ -25,8 +26,10 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  // Network-first for tiles (always fresh), cache-first for app shell
-  if (req.url.includes('basemaps.cartocdn.com') || req.url.includes('tile')) {
+  const url = new URL(req.url);
+
+  // Tiles: network-first, fall back to cache, cache successful results
+  if (url.host.includes('basemaps.cartocdn.com') || url.pathname.includes('tile')) {
     e.respondWith(
       fetch(req).then(r => {
         const clone = r.clone();
@@ -36,5 +39,22 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
+
+  // App shell (same-origin): network-first so users always see new code,
+  // fall back to cache when offline.
+  if (url.origin === self.location.origin) {
+    e.respondWith(
+      fetch(req).then(r => {
+        if (r && r.ok) {
+          const clone = r.clone();
+          caches.open(CACHE).then(c => c.put(req, clone));
+        }
+        return r;
+      }).catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Other (third-party CDNs e.g. unpkg leaflet): cache-first to keep offline
   e.respondWith(caches.match(req).then(r => r || fetch(req)));
 });

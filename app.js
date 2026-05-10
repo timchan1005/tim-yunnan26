@@ -873,9 +873,18 @@ document.addEventListener('DOMContentLoaded', () => {
     target.value = desc || '找不到相關說明。可手動輸入。';
   });
 
-  // Service worker (PWA)
+  // Service worker (PWA) — auto-reload when a new SW takes over so users
+  // always get fresh code (avoids the 'thin strip / broken modal' caching bug)
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    let refreshed = false;
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshed) return;
+      refreshed = true;
+      window.location.reload();
+    });
   }
 });
 
