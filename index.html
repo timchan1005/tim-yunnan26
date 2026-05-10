@@ -177,66 +177,98 @@
 
 <!-- Edit modal -->
 <div class="modal" id="modal" hidden>
-  <div class="modal-card">
+  <div class="modal-card modal-card-wide">
     <div class="modal-header">
-      <h3 id="modal-title">編輯地點</h3>
+      <div class="modal-header-text">
+        <h3 id="modal-title">編輯地點</h3>
+        <p class="modal-subtitle" id="modal-subtitle">填寫資料或喺地圖揀位置</p>
+      </div>
       <button class="icon-btn" id="btn-close-modal" aria-label="關閉">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body">
-      <label class="field">
-        <span>搜尋地點</span>
+    <div class="modal-body modal-body-grid">
+      <!-- Section: search -->
+      <div class="form-section form-section-full">
+        <div class="form-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>快速搜尋</span>
+        </div>
         <div class="search-box">
-          <input type="text" id="f-search" placeholder="例：石林風景區 / Lijiang Old Town" autocomplete="off">
+          <input type="text" id="f-search" placeholder="打地點名嚟自動填入座標（例：石林風景區）" autocomplete="off">
           <div class="search-results" id="f-search-results" hidden></div>
         </div>
-      </label>
-      <label class="field">
-        <span>名稱</span>
-        <input type="text" id="f-name" placeholder="例：石林風景區">
-      </label>
-      <label class="field">
-        <span>類型</span>
-        <select id="f-kind">
-          <option value="spot">景點</option>
-          <option value="hotel">酒店</option>
-        </select>
-      </label>
-      <label class="field" id="f-day-wrap">
-        <span>所屬日子</span>
-        <select id="f-day"></select>
-      </label>
-      <div class="field-row">
+      </div>
+
+      <!-- Section: basic info (left column on desktop) -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>基本資料</span>
+        </div>
         <label class="field">
-          <span>緯度</span>
-          <input type="number" step="any" id="f-lat" placeholder="25.0389">
+          <span>名稱</span>
+          <input type="text" id="f-name" placeholder="例：石林風景區">
         </label>
+        <div class="field-row">
+          <label class="field">
+            <span>類型</span>
+            <select id="f-kind">
+              <option value="spot">景點</option>
+              <option value="hotel">酒店</option>
+            </select>
+          </label>
+          <label class="field" id="f-day-wrap">
+            <span>所屬日子</span>
+            <select id="f-day"></select>
+          </label>
+        </div>
         <label class="field">
-          <span>經度</span>
-          <input type="number" step="any" id="f-lng" placeholder="102.7183">
+          <span>時間段</span>
+          <input type="text" id="f-time" placeholder="例：上午 / 下午 / 晚上">
         </label>
       </div>
-      <button class="btn-secondary" id="btn-pick" type="button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        喺地圖揀位置
-      </button>
-      <label class="field">
-        <span>時間段</span>
-        <input type="text" id="f-time" placeholder="例：上午 / 下午 / 晚上">
-      </label>
-      <label class="field">
-        <span>備註</span>
-        <textarea id="f-note" rows="2" placeholder="例：白族建築、必試喜洲粑粑"></textarea>
-      </label>
-      <label class="field">
-        <span>詳細說明</span>
-        <textarea id="f-desc" rows="4" placeholder="點「取得說明」可自動填入維基資料，或手動輸入"></textarea>
-        <button class="btn-secondary" type="button" id="btn-fetch-desc" style="margin-top:6px;margin-bottom:0;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          取得說明
+
+      <!-- Section: location (right column on desktop) -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>位置</span>
+        </div>
+        <div class="field-row">
+          <label class="field">
+            <span>緯度</span>
+            <input type="number" step="any" id="f-lat" placeholder="25.0389">
+          </label>
+          <label class="field">
+            <span>經度</span>
+            <input type="number" step="any" id="f-lng" placeholder="102.7183">
+          </label>
+        </div>
+        <button class="btn-secondary btn-pick-map" id="btn-pick" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>喺地圖揀位置</span>
         </button>
-      </label>
+        <label class="field">
+          <span>備註</span>
+          <textarea id="f-note" rows="2" placeholder="例：白族建築、必試喜洲粑粑"></textarea>
+        </label>
+      </div>
+
+      <!-- Section: description (full width) -->
+      <div class="form-section form-section-full">
+        <div class="form-section-title form-section-title-row">
+          <div class="form-section-title-left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>詳細說明</span>
+          </div>
+          <button class="btn-link" type="button" id="btn-fetch-desc">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>從維基自動取得</span>
+          </button>
+        </div>
+        <textarea id="f-desc" rows="4" placeholder="留空可之後再填，或撳「從維基自動取得」自動填入"></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-danger" id="btn-delete">刪除</button>
